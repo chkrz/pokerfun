@@ -256,7 +256,6 @@ def compare_hands(h1, h2):
         return "right", two[0], two[1]
 
 
-
 '''
 a = ['QD', 'KD', '9D', 'JD', 'TD'] 
 b = ['JS', '8S', 'KS', 'AS', 'QS']

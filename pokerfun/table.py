@@ -2,7 +2,8 @@ from pokerfun.pokers.texas_poker import TexasPoker
 
 
 class Table:
-    def __init__(self, num_players):
+    def __init__(self, max_num_players):
+        self.max_num_players = max_num_players
         self.deck = TexasPoker()
         self.players = []
         self.pot = 0
@@ -10,9 +11,28 @@ class Table:
         self.current_bet = 0
         self.round = 0  # 表示当前是第几轮下注
         self.dealer_position = 0
+        self.current_stage = 'Pre-Flop'
+
+    def play_hand(self):
+        self.start_new_hand()
+        self.betting_round()
+
+        self.current_stage = 'Flop'
+        self.next_round()
+        self.betting_round()
+
+        self.current_stage = 'Turn'
+        self.next_round()
+        self.betting_round()
+
+        self.current_stage = 'River'
+        self.next_round()
+        self.betting_round()
+
+        self.determine_winner()
 
     def add_player(self, player):
-        if len(self.players) >= 9:
+        if len(self.players) > self.max_num_players:
             raise ValueError("Table is full")
         self.players.append(player)
 
@@ -31,6 +51,7 @@ class Table:
         self.dealer_position = (self.dealer_position + 1) % len(self.players)
         self.post_blinds()
         self.deal_hole_cards()
+        self.current_stage = 'Pre-Flop'
 
     def post_blinds(self):
         small_blind_position = (self.dealer_position + 1) % len(self.players)
