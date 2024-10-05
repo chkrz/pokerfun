@@ -1,3 +1,9 @@
+import random
+
+from pokerfun.player import Player
+from pokerfun.table import Table
+
+
 class Game:
     def __init__(self, player_names, starting_balance):
         self.players = [Player(name, starting_balance) for name in player_names]
@@ -6,7 +12,6 @@ class Game:
             self.table.add_player(player)
         self.current_stage = 'Pre-Flop'
         self.winner = None
-        self.small_bind
 
     def play_hand(self):
         self.table.start_new_hand()

@@ -131,7 +131,7 @@ def evaluate_hand(h):
 
     if is_royal(h):
         return "ROYAL FLUSH", h, 10
-    elif is_seq(h) and is_flush(h) :
+    elif is_seq(h) and is_flush(h):
         return "STRAIGHT FLUSH", h, 9
     elif is_fourofakind(h):
         _, fourofakind = is_fourofakind(h)
@@ -160,13 +160,11 @@ def evaluate_hand(h):
 
 #this monster function evaluates two hands and also deals with ties and edge cases
 # this probably should be broken up into separate functions but aint no body got time for that
-def compare_hands(h1,h2):
+def compare_hands(h1, h2):
     one, two = evaluate_hand(h1), evaluate_hand(h2)
     if one[0] == two[0]:
-
         if one[0] =="STRAIGHT FLUSH":
-
-            sett1, sett2 = convert_tonums(h1), convert_tonums(h2)
+            sett1, sett2 = convert2nums(h1), convert2nums(h2)
             sett1, sett2 = [int(x[:-1]) for x in sett1], [int(x[:-1]) for x in sett2]
             com = compare(sett1, sett2)
 
@@ -178,14 +176,12 @@ def compare_hands(h1,h2):
                 return "left", one[0], one[1]
 
         elif one[0] == "TWO PAIR":
-
             leftover1, leftover2 = is_twopair(h1), is_twopair(h2)
             twm1, twm2 = max([int(x) for x in list(leftover1[1])]), max([int(x) for x in list(leftover2[1])])
             if twm1 > twm2:
                 return "left", one[0], one[1]
             elif twm1 < twm2:
                 return "right", two[0], two[1]
-
 
             if compare(list(leftover1[1]), list(leftover2[1])) == "TIE":
                 l1 = [x[:-1] for x in h1 if x[:-1] not in leftover1[1]]
@@ -196,28 +192,23 @@ def compare_hands(h1,h2):
                     return "left", one[0], one[1]
                 else:
                     return "right", two[0], two[1]
-            elif compare(list(leftover1[1]), list(leftover2[1]))  == "RIGHT":
+            elif compare(list(leftover1[1]), list(leftover2[1])) == "RIGHT":
                 return "right", two[0], two[1]
-            elif  compare(list(leftover1[1]), list(leftover2[1]))  == "LEFT":
+            elif compare(list(leftover1[1]), list(leftover2[1])) == "LEFT":
                 return "left", one[0], one[1]
-
 
         elif one[0] == "PAIR":
             sh1, sh2 = int(is_pair(h1)[1]), int(is_pair(h2)[1])
             if sh1 == sh2:
 
-                c1 = [int(x[:-1]) for x in convert_tonums(h1) if not int(sh1) == int(x[:-1])]
-                c2 = [int(x[:-1]) for x in convert_tonums(h2) if not int(sh1) == int(x[:-1])]
+                c1 = [int(x[:-1]) for x in convert2nums(h1) if not int(sh1) == int(x[:-1])]
+                c2 = [int(x[:-1]) for x in convert2nums(h2) if not int(sh1) == int(x[:-1])]
                 if compare(c1, c2) == "TIE":
                     return "none", one[1], two[1]
                 elif compare(c1, c2) == "RIGHT":
                     return "right", two[0], two[1]
                 else:
                     return "left", one[0], one[1]
-
-
-
-
             elif h1 > h2:
                 return "right", two[0], two[1]
             else:
@@ -231,7 +222,7 @@ def compare_hands(h1,h2):
             else:
                 return "right", two[0], two[1]
         elif one[0] == "HIGH CARD":
-            sett1, sett2 = convert_tonums(h1), convert_tonums(h2)
+            sett1, sett2 = convert2nums(h1), convert2nums(h2)
             sett1, sett2 = [int(x[:-1]) for x in sett1], [int(x[:-1]) for x in sett2]
             com = compare(sett1, sett2)
             if com == "TIE":
@@ -242,7 +233,6 @@ def compare_hands(h1,h2):
                 return "left", one[0], one[1]
 
 
-
         elif len(one[1]) < 5:
             if max(one[1])  == max(two[1]):
                 return "none", one[1], two[1]
@@ -251,10 +241,10 @@ def compare_hands(h1,h2):
             else:
                 return "right", two[0], two[1]
         else:
-            n_one, n_two = convert_tonums(one[1]), convert_tonums(two[1])
+            n_one, n_two = convert2nums(one[1]), convert2nums(two[1])
             n_one, n_two = [int(x[:-1]) for x in n_one], [int(x[:-1]) for x in n_two]
 
-            if max(n_one)  == max(n_two):
+            if max(n_one) == max(n_two):
                 return "none", one[1], two[1]
             elif max(n_one) > max(n_two):
                 return "left", one[0], one[1]
