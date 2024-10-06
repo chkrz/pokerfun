@@ -1,3 +1,7 @@
+import itertools
+from functools import cmp_to_key
+
+from pokerfun.helpers import compare_hands
 from pokerfun.pokers.texas_poker import TexasPoker
 
 
@@ -30,6 +34,7 @@ class Table:
         self.betting_round()
 
         self.determine_winner()
+        self.distribute_pot()
 
     def add_player(self, player):
         if len(self.players) > self.max_num_players:
@@ -98,19 +103,62 @@ class Table:
 
     def determine_winner(self):
         # 最后给到的其实应该是active的人的ranks {0: , 1: , ...}
-        pass
-        # 不如直接返回 [[(), ()],[(), ()]]
+        # 如果只有一个人active了直接就是那个人
+        active_players = [player for player in self.players if player.is_active]
+        inactive_players = [player for player in self.players if not player.is_active]
+
+        if len(active_players) == 1:
+            return active_players[0]
+
+        for player in active_players:
+            combinations = list(itertools.combinations(self.community_cards+player.hand, 5))
+            bigger = combinations[0]
+            for combination in combinations[1:]:
+                larger, one, two = compare_hands(bigger, combination)
+                if larger == "left":
+                    bigger = combinations[0]
+                elif larger == "right":
+                    bigger = combinations[0]
+                else:
+                    bigger = combinations[0]
+            player.best_hand = bigger
+
+        # 对选手列表按牌力排序
+        sorted_players = sorted(active_players, key=cmp_to_key(lambda p1, p2: compare_hands(p1.best_hand, p2.best_hand)[0]),
+                                reverse=True)
+
+        # 分组
+        grouped_players = []
+        for key, group in itertools.groupby(
+                sorted_players,
+                key=lambda p: compare_hands(p.best_hand, sorted_players[0].best_hand)[0] == 0):
+            grouped_players.append(list(group))
+
+        # 最后player之间两两比大小
+        # ranks = [active_players.pop(0)]
+        # while active_players:
+        #     player = active_players.pop(0)
+        #     for i, rank in enumerate(ranks):
+        #         larger, one, two = compare_hands(rank.best_hand, player.best_hand)
+        #         if larger == "left":
+        #             continue
+        #         elif larger == "right":
+        #             ranks = ranks[0:i] + [player] + ranks[i:]
+        #             break
+        #         else:
+        #             ranks = ranks[0:i] + [player] + ranks[i:]
+        #             break
+        #     if i == len(ranks):
+        #         ranks.append(player)
+        return grouped_players
 
     def distribute_pot(self, ranks):
-        total_bet = 0
-        for player in self.players:
-            if player.is_active:
-                total_bet += player.total_bet
-        unit_bet_amount = self.pot/total_bet
+        if len(ranks) == 1:
+            ranks[0].balance += self.pot
+            return
 
-        # 本质上是更高梯队的人 可以按照投入 分配低梯队的人的钱
-        # 更高梯队的人，钱投入少的部分先claim, 平分
-        level_amounts = []
+
+        level_amounts = [[]for player in ranks]
         for i, rank in enumerate(level_amounts):
             level_count = len(rank)
             distributed = 0

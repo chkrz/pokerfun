@@ -7,7 +7,7 @@ def most_common(lst):
     return data.most_common(1)[0]
 
 
-def convert2nums(h, nums = {'T':10, 'J':11, 'Q':12, 'K':13, "A": 14}):
+def convert2nums(h, nums={'T':10, 'J':11, 'Q':12, 'K':13, "A": 14}):
     for x in range(len(h)):
         if (h[x][0]) in nums.keys():
             h[x] = str(nums[h[x][0]]) + h[x][1]
@@ -169,33 +169,33 @@ def compare_hands(h1, h2):
             com = compare(sett1, sett2)
 
             if com == "TIE":
-                return "none", one[1], two[1]
-            elif com == "RIGHT":
-                return "right", two[0], two[1]
+                return 0, one[1], two[1]
+            elif com == -1:
+                return -1, two[0], two[1]
             else:
-                return "left", one[0], one[1]
+                return 1, one[0], one[1]
 
         elif one[0] == "TWO PAIR":
             leftover1, leftover2 = is_twopair(h1), is_twopair(h2)
             twm1, twm2 = max([int(x) for x in list(leftover1[1])]), max([int(x) for x in list(leftover2[1])])
             if twm1 > twm2:
-                return "left", one[0], one[1]
+                return 1, one[0], one[1]
             elif twm1 < twm2:
-                return "right", two[0], two[1]
+                return -1, two[0], two[1]
 
             if compare(list(leftover1[1]), list(leftover2[1])) == "TIE":
                 l1 = [x[:-1] for x in h1 if x[:-1] not in leftover1[1]]
                 l2 = [x[:-1] for x in h2 if x[:-1] not in leftover2[1]]
                 if int(l1[0]) == int(l2[0]):
-                    return "none", one[1], two[1]
+                    return 0, one[1], two[1]
                 elif int(l1[0]) > int(l2[0]):
-                    return "left", one[0], one[1]
+                    return 1, one[0], one[1]
                 else:
-                    return "right", two[0], two[1]
-            elif compare(list(leftover1[1]), list(leftover2[1])) == "RIGHT":
-                return "right", two[0], two[1]
-            elif compare(list(leftover1[1]), list(leftover2[1])) == "LEFT":
-                return "left", one[0], one[1]
+                    return -1, two[0], two[1]
+            elif compare(list(leftover1[1]), list(leftover2[1])) == -1:
+                return -1, two[0], two[1]
+            elif compare(list(leftover1[1]), list(leftover2[1])) == 1:
+                return 1, one[0], one[1]
 
         elif one[0] == "PAIR":
             sh1, sh2 = int(is_pair(h1)[1]), int(is_pair(h2)[1])
@@ -204,56 +204,54 @@ def compare_hands(h1, h2):
                 c1 = [int(x[:-1]) for x in convert2nums(h1) if not int(sh1) == int(x[:-1])]
                 c2 = [int(x[:-1]) for x in convert2nums(h2) if not int(sh1) == int(x[:-1])]
                 if compare(c1, c2) == "TIE":
-                    return "none", one[1], two[1]
-                elif compare(c1, c2) == "RIGHT":
-                    return "right", two[0], two[1]
+                    return 0, one[1], two[1]
+                elif compare(c1, c2) == -1:
+                    return -1, two[0], two[1]
                 else:
-                    return "left", one[0], one[1]
+                    return 1, one[0], one[1]
             elif h1 > h2:
-                return "right", two[0], two[1]
+                return -1, two[0], two[1]
             else:
-                return "left", one[0], one[1]
+                return 1, one[0], one[1]
 
         elif one[0] == 'FULL HOUSE':
-
-            fh1, fh2 =  int(is_fullhouse(h1)[1][0][0]), int(is_fullhouse(h2)[1][0][0])
+            fh1, fh2 = int(is_fullhouse(h1)[1][0][0]), int(is_fullhouse(h2)[1][0][0])
             if fh1 > fh2:
-                return "left", one[0], one[1]
+                return 1, one[0], one[1]
             else:
-                return "right", two[0], two[1]
+                return -1, two[0], two[1]
         elif one[0] == "HIGH CARD":
             sett1, sett2 = convert2nums(h1), convert2nums(h2)
             sett1, sett2 = [int(x[:-1]) for x in sett1], [int(x[:-1]) for x in sett2]
             com = compare(sett1, sett2)
             if com == "TIE":
-                return "none", one[1], two[1]
-            elif com == "RIGHT":
-                return "right", two[0], two[1]
+                return 0, one[1], two[1]
+            elif com == -1:
+                return -1, two[0], two[1]
             else:
-                return "left", one[0], one[1]
-
+                return 1, one[0], one[1]
 
         elif len(one[1]) < 5:
-            if max(one[1])  == max(two[1]):
-                return "none", one[1], two[1]
+            if max(one[1]) == max(two[1]):
+                return 0, one[1], two[1]
             elif max(one[1]) > max(two[1]):
-                return "left", one[0], one[1]
+                return 1, one[0], one[1]
             else:
-                return "right", two[0], two[1]
+                return -1, two[0], two[1]
         else:
             n_one, n_two = convert2nums(one[1]), convert2nums(two[1])
             n_one, n_two = [int(x[:-1]) for x in n_one], [int(x[:-1]) for x in n_two]
 
             if max(n_one) == max(n_two):
-                return "none", one[1], two[1]
+                return 0, one[1], two[1]
             elif max(n_one) > max(n_two):
-                return "left", one[0], one[1]
+                return 1, one[0], one[1]
             else:
-                return "right", two[0], two[1]
+                return -1, two[0], two[1]
     elif one[2] > two[2]:
-        return "left", one[0], one[1]
+        return 1, one[0], one[1]
     else:
-        return "right", two[0], two[1]
+        return -1, two[0], two[1]
 
 
 '''
