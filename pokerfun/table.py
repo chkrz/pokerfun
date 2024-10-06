@@ -82,9 +82,9 @@ class Table:
     def betting_round(self):
         for player in self.players:
             if player.is_active:
-                # 简单示例：每个玩家都下注当前下注金额
-                bet_amount = self.current_bet
-                self.pot += player.bet(bet_amount)
+                # player做行动
+                # 到底需要什么info作为参数传入
+                player.act(self.current_bet)
 
     def next_round(self):
         if self.round == 0:
@@ -95,6 +95,49 @@ class Table:
             self.deal_river()
         self.round += 1
         self.betting_round()
+
+    def determine_winner(self):
+        # 最后给到的其实应该是active的人的ranks {0: , 1: , ...}
+        pass
+        # 不如直接返回 [[(), ()],[(), ()]]
+
+    def distribute_pot(self, ranks):
+        total_bet = 0
+        for player in self.players:
+            if player.is_active:
+                total_bet += player.total_bet
+        unit_bet_amount = self.pot/total_bet
+
+        # 本质上是更高梯队的人 可以按照投入 分配低梯队的人的钱
+        # 更高梯队的人，钱投入少的部分先claim, 平分
+        level_amounts = []
+        for i, rank in enumerate(level_amounts):
+            level_count = len(rank)
+            distributed = 0
+            # 代表同一层上一轮已经分了的钱的数量
+            current_amount = 0
+            for ap in rank:
+                ap[0] -= current_amount
+                totals = 0
+                if ap[0] == 0:
+                    pass
+
+                elif i + 1 >= len(level_amounts):
+                    ap[1].balance += ap[0]
+                    ap[0] = 0
+                else:
+                    for rank_ in level_amounts[i+1]:
+                        for ap_ in rank_:
+                            if ap_[0] <= ap[0]:
+                                totals += ap_[0]
+                                ap_[0] = 0
+                            else:
+                                ap_[0] -= ap[0]
+                                totals += ap[0]
+                    # 此时已经知道第一层可以claim的总量了
+                    distributed += totals / level_count
+                    ap[1].balance += distributed
+                    current_amount += ap[0]
 
     def __repr__(self):
         return (f'Table with {len(self.players)} players, '
