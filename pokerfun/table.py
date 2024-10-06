@@ -150,6 +150,9 @@ class Table:
         #             break
         #     if i == len(ranks):
         #         ranks.append(player)
+        for group in grouped_players:
+            for i, player in enumerate(group):
+                group[i] = (player.total_bet, player)
         return grouped_players
 
     def distribute_pot(self, ranks):
@@ -157,8 +160,7 @@ class Table:
             ranks[0].balance += self.pot
             return
 
-
-        level_amounts = [[]for player in ranks]
+        level_amounts = ranks
         for i, rank in enumerate(level_amounts):
             level_count = len(rank)
             distributed = 0
